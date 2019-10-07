@@ -1,3 +1,5 @@
+var exec = require('child_process').exec;
+
 import {
   Accessory,
   Characteristic,
@@ -39,6 +41,11 @@ televisionService
   .getCharacteristic(Characteristic.Active)!
   .on(CharacteristicEventTypes.SET, (newValue: CharacteristicValue, callback: CharacteristicSetCallback) => {
     console.log("set Active => setNewValue: " + newValue);
+    if (newValue == 1) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/poweron", function(){});
+    } else if (newValue == 0) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/poweroff", function(){});
+    };
     callback(null);
   });
 
@@ -49,6 +56,13 @@ televisionService
   .getCharacteristic(Characteristic.ActiveIdentifier)!
   .on(CharacteristicEventTypes.SET, (newValue: CharacteristicValue, callback: CharacteristicSetCallback) => {
     console.log("set Active Identifier => setNewValue: " + newValue);
+    if (newValue == 1) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/home", function(){});
+    } else if(newValue == 2) {
+      exec("curl -d '' http://10.0.0.238:8060/launch/19977", function(){});
+    } else if (newValue == 3) {
+      exec("curl -d '' http://10.0.0.238:8060/launch/12", function(){});
+    }
     callback(null);
   });
 
@@ -56,6 +70,23 @@ televisionService
   .getCharacteristic(Characteristic.RemoteKey)!
   .on(CharacteristicEventTypes.SET, (newValue: CharacteristicValue, callback: CharacteristicSetCallback) => {
     console.log("set Remote Key => setNewValue: " + newValue);
+    if (newValue == 8) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/select", function(){});
+    } else if (newValue == 4) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/up", function(){});
+    } else if (newValue == 5) {
+        exec("curl -d '' http://10.0.0.238:8060/keypress/down", function(){});
+    } else if (newValue == 6) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/left", function(){});
+    } else if (newValue == 7) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/right", function(){});
+    } else if (newValue == 9) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/back", function(){});
+    } else if (newValue == 11) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/play", function(){});
+    } else if (newValue == 15) {
+      exec("curl -d '' http://10.0.0.238:8060/keypress/info", function(){});
+    }
     callback(null);
   });
 
@@ -89,23 +120,23 @@ speakerService.getCharacteristic(Characteristic.VolumeSelector)!
 
 // HDMI 1
 
-var inputHDMI1 = tv.addService(Service.InputSource, "hdmi1", "HDMI 1");
+var inputHome = tv.addService(Service.InputSource, "home", "Home");
 
-inputHDMI1
+inputHome
   .setCharacteristic(Characteristic.Identifier, 1)
-  .setCharacteristic(Characteristic.ConfiguredName, "HDMI 1")
+  .setCharacteristic(Characteristic.ConfiguredName, "Home")
   .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-  .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
+  .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.APPLICATION);
 
-// HDMI 2
+// Spotify
 
-var inputHDMI2 = tv.addService(Service.InputSource, "hdmi2", "HDMI 2");
+var inputSpotify = tv.addService(Service.InputSource, "spotify", "Spotify");
 
-inputHDMI2
+inputSpotify
   .setCharacteristic(Characteristic.Identifier, 2)
-  .setCharacteristic(Characteristic.ConfiguredName, "HDMI 2")
+  .setCharacteristic(Characteristic.ConfiguredName, "Spotify")
   .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
-  .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.HDMI);
+  .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.APPLICATION);
 
 // Netflix
 
@@ -117,6 +148,6 @@ inputNetflix
   .setCharacteristic(Characteristic.IsConfigured, Characteristic.IsConfigured.CONFIGURED)
   .setCharacteristic(Characteristic.InputSourceType, Characteristic.InputSourceType.APPLICATION);
 
-televisionService.addLinkedService(inputHDMI1);
-televisionService.addLinkedService(inputHDMI2);
+televisionService.addLinkedService(inputHome);
+televisionService.addLinkedService(inputSpotify);
 televisionService.addLinkedService(inputNetflix);
